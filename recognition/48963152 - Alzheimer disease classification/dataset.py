@@ -24,8 +24,10 @@ class ADNIDataset(Dataset):
 
             for image in os.listdir(sub):
                 if image.lower().endswith(IMG_EXT):
-                    path = os.path.join(c, image)
-                    self.samples.append((path, classes[c]))
+                    path = os.path.join(self.root_dir, c, image)
+
+                    if os.path.isfile(path):
+                        self.samples.append((path, classes[c]))
 
     def __len__(self):
         return len(self.samples)
