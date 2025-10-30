@@ -44,11 +44,12 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 # ========================
 # 3. Model setup
 # ========================
-model = ConvNeXtClassifier(variant='tiny', number_of_classes=2)
+model = ConvNeXtClassifier(variant='tiny', number_of_classes=2, dropout=0.3)
 model = model.to(device)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
 
 # ========================
 # 4. Training loop
@@ -88,6 +89,8 @@ for epoch in range(num_epochs):
             _, preds = torch.max(outputs, 1)
             val_correct += (preds == labels).sum().item()
             val_total += labels.size(0)
+
+    scheduler.step()
 
     val_loss = val_running_loss / val_total
     val_acc = val_correct / val_total
