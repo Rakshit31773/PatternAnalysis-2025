@@ -1,4 +1,3 @@
-# train.py
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -6,32 +5,29 @@ from torch.utils.data import random_split, DataLoader
 from torchvision import transforms
 import matplotlib.pyplot as plt
 import os
-
-from tqdm import tqdm
 from dataset import ADNIDataset
 from modules import ConvNeXtClassifier
 
-# ========================
-# 1. Configuration
-# ========================
-data_root = "home/groups/comp3710/ADNI/AD_NC/train"
-batch_size = 16
-num_epochs = 3
-learning_rate = 1e-4
-val_split = 0.2
+
+
+# =========Configuration============
+model_path = "/saved_models/convnext_adni.pth"
+data_root = "/home/groups/comp3710/ADNI/AD_NC/train" #root directory of the training data
+batch_size = 512     #Number of samples processed before the model is updated
+num_epochs = 30       #Number of times the Training loop will iterate over the whole dataset
+learning_rate = 5e-5  #controls how much to change the model according to the error
+val_split = 0.2       #The portion of training dataset that will be used for validation
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# ========================
-# 2. Data loading
-# ========================
+
+# =========Data Loading============
 train_transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
+    transforms.Resize((224, 224)),                     #ConvNeXt expects images of size 224x224
+    transforms.ToTensor(),                             #Scales the pixel values to 0 and 1
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                         std=[0.229, 0.224, 0.225])
 ])
 
-print(os.listdir(data_root))
 dataset = ADNIDataset(root_dir=data_root, transform=train_transform)
 
 val_size = int(len(dataset) * val_split)
@@ -41,19 +37,18 @@ train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-# ========================
-# 3. Model setup
-# ========================
+
+# =========Model Initialization============
 model = ConvNeXtClassifier(variant='tiny', number_of_classes=2, dropout=0.3)
 model = model.to(device)
+# model.load_state_dict(torch.load(model_path, map_location=device))
 
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-5)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
 
-# ========================
-# 4. Training loop
-# ========================
+
+# =========Traversing through the dataset============
 train_losses, val_losses = [], []
 train_accs, val_accs = [], []
 
@@ -105,16 +100,14 @@ for epoch in range(num_epochs):
         f"Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
 
 
-# ========================
-# 5. Save model
-# ========================
+# =========Saving the model============
 os.makedirs("saved_models", exist_ok=True)
 torch.save(model.state_dict(), "saved_models/convnext_adni.pth")
 print("Model saved!")
 
-# ========================
-# 6. Plot losses & accuracy
-# ========================
+# =========Plotting the loss and accuracy graph============
+os.makedirs("plots", exist_ok=True)
+
 plt.figure(figsize=(10,4))
 plt.subplot(1,2,1)
 plt.plot(train_losses, label='Train Loss')
@@ -128,4 +121,5 @@ plt.plot(val_accs, label='Val Acc')
 plt.legend()
 plt.title("Accuracy")
 
-plt.show()
+plt.savefig("plots/training_plot.png")
+plt.close()

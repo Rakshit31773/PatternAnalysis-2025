@@ -1,9 +1,6 @@
 import os
 from PIL import Image
-import torch
-from torch.utils.data import Dataset, DataLoader 
-import torchvision.transforms as transform
-import numpy as np
+from torch.utils.data import Dataset
 
 IMG_EXT = ('.png', '.jpg', '.jpeg')
 classes = {'NC' : 0, 'AD' : 1}
