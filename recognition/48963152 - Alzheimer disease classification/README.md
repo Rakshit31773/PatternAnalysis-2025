@@ -79,9 +79,9 @@ Hyperparameters:
 ```markdown
 | Parameter       | Value   |
 |-----------------|---------|
-| `batch_size`    | `512`   |
-| `num_epochs`    | `30`    |
-| `learning_rate` | `5e-5`  |
+| `batch_size`    | `32`   |
+| `num_epochs`    | `80`    |
+| `learning_rate` | `1e-4`  |
 | `val_split`     | `0.2`   |
 | `dropout`       | `0.3`   |
 ```

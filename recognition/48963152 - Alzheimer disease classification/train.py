@@ -14,7 +14,7 @@ from modules import ConvNeXtClassifier
 model_path = "/saved_models/convnext_adni.pth"
 data_root = "/home/groups/comp3710/ADNI/AD_NC/train" #root directory of the training data
 batch_size = 32    #Number of samples processed before the model is updated
-num_epochs = 30       #Number of times the Training loop will iterate over the whole dataset
+num_epochs = 80       #Number of times the Training loop will iterate over the whole dataset
 learning_rate = 1e-4 #controls how much to change the model according to the error
 val_split = 0.2       #The portion of training dataset that will be used for validation
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
