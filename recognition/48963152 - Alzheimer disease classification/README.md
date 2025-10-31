@@ -79,9 +79,9 @@ Hyperparameters:
 ```markdown
 | Parameter       | Value   |
 |-----------------|---------|
-| `batch_size`    | `64`    |
-| `num_epochs`    | `80     |
-| `learning_rate` | `1e-4`  |
+| `batch_size`    | `512`   |
+| `num_epochs`    | `30`    |
+| `learning_rate` | `5e-5`  |
 | `val_split`     | `0.2`   |
 | `dropout`       | `0.3`   |
 ```
@@ -98,3 +98,4 @@ Evaluates the model saved from training at path 'saved_models/convnext_agni.pth'
 3. Run inference on the test set.
 4. Compute overall accuracy and print to console.
 ```
+
